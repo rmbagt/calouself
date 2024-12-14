@@ -135,5 +135,9 @@ public class RegisterView {
         addressField.clear();
         messageLabel.setText("");
     }
+
+    public Button getBackButton() {
+        return backToLoginButton;
+    }
 }
 

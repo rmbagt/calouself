@@ -6,8 +6,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 import connect.Connect;
 import model.User;
-import view.LoginView;
-import view.RegisterView;
+import view.*;
 import javafx.scene.control.RadioButton;
 import javafx.stage.Stage;
 
@@ -15,26 +14,69 @@ public class UserController {
     private Connect connect;
     private LoginView loginView;
     private RegisterView registerView;
+    private DashboardView dashboardView;
+    private UploadItemView uploadItemView;
+    private WishlistView wishlistView;
+    private PurchaseHistoryView purchaseHistoryView;
+    private AdminView adminView;
     private Stage stage;
+    private User currentUser;
+    private ItemController itemController;
+    private WishlistController wishlistController;
+    private TransactionController transactionController;
+    private AdminController adminController;
     
     public UserController(Stage stage) {
         this.stage = stage;
         this.connect = Connect.getInstance();
         this.loginView = new LoginView();
         this.registerView = new RegisterView();
+        this.itemController = new ItemController();
+        this.wishlistController = new WishlistController();
+        this.transactionController = new TransactionController();
+        this.adminController = new AdminController();
         
         setupEventHandlers();
         showLoginScene();
     }
     
     private void setupEventHandlers() {
-        // Login view handlers
-        loginView.getLoginButton().setOnAction(e -> handleLogin());
+        // Login view handlers        
         loginView.getRegisterButton().setOnAction(e -> showRegisterScene());
+        loginView.getLoginButton().setOnAction(e -> handleLogin());
+        loginView.getNavigationBar().getLogoutMenuItem().setOnAction(e -> showLoginScene());
         
         // Register view handlers
         registerView.getRegisterButton().setOnAction(e -> handleRegister());
-        registerView.getBackToLoginButton().setOnAction(e -> showLoginScene());
+        registerView.getBackButton().setOnAction(e -> showLoginScene());
+        
+        // Dashboard view handlers
+        
+    }
+    
+    private void setupDashboardEventHandlers() {
+        NavigationBar nav = dashboardView.getNavigationBar();
+        nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
+        nav.getBrowseItemsMenuItem().setOnAction(e -> handleBrowseItems());
+        if (nav.getUploadItemMenuItem() != null) {
+            nav.getUploadItemMenuItem().setOnAction(e -> handleUploadItem());
+        }
+        if (nav.getViewWishlistMenuItem() != null) {
+            nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
+        }
+        nav.getViewPurchaseHistoryMenuItem().setOnAction(e -> handleViewPurchaseHistory());
+        dashboardView.getRefreshButton().setOnAction(e -> handleRefreshItems());
+        
+        if (currentUser.getRole().equals("Buyer")) {
+            dashboardView.getAddToWishlistButton().setOnAction(e -> handleAddToWishlist());
+        }
+    }
+    
+    private void setupUploadItemEventHandlers() {
+        NavigationBar nav = uploadItemView.getNavigationBar();
+        nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
+        nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+        uploadItemView.getUploadButton().setOnAction(e -> handleItemUpload());
     }
     
     private void showLoginScene() {
@@ -49,6 +91,16 @@ public class UserController {
         stage.setTitle("CaLouselF - Register");
     }
     
+    private void showDashboardScene(User user) {
+        this.currentUser = user;
+        this.dashboardView = new DashboardView(user);
+        setupDashboardEventHandlers();
+        loadItems();
+        stage.setScene(dashboardView.getScene());
+        stage.setTitle("CaLouselF - Dashboard");
+        dashboardView.setWelcomeMessage("Welcome, " + user.getUsername() + " (" + user.getRole() + ")");
+    }
+    
     private void handleLogin() {
         String username = loginView.getUsernameField().getText();
         String password = loginView.getPasswordField().getText();
@@ -60,8 +112,8 @@ public class UserController {
         
         // Check for admin login
         if (username.equals("admin") && password.equals("admin")) {
-            // TODO: Navigate to admin page
             loginView.showSuccessMessage("Admin login successful");
+            showAdminDashboardScene();
             return;
         }
         
@@ -83,7 +135,7 @@ public class UserController {
                     rs.getString("Role")
                 );
                 loginView.showSuccessMessage("Login successful");
-                // TODO: Navigate to appropriate page based on user role
+                showDashboardScene(user);
             } else {
                 loginView.showErrorMessage("Invalid username or password");
             }
@@ -183,5 +235,94 @@ public class UserController {
             return false;
         }
     }
+    
+    private void handleLogout() {
+        currentUser = null;
+        showLoginScene();
+    }
+    
+    private void handleBrowseItems() {
+        loadItems();
+    }
+    
+    private void handleUploadItem() {
+        if (currentUser.getRole().equals("Seller")) {
+            uploadItemView = new UploadItemView(currentUser);
+            setupUploadItemEventHandlers();
+            stage.setScene(uploadItemView.getScene());
+            stage.setTitle("CaLouselF - Upload Item");
+        } else {
+            System.out.println("Only sellers can upload items");
+        }
+    }
+    
+    private void handleItemUpload() {
+        itemController.handleItemUpload(uploadItemView, currentUser);
+    }
+    
+    
+    private void handleAddToWishlist() {
+        itemController.handleAddToWishlist(dashboardView, currentUser);
+    }
+    
+    private void handleViewWishlist() {
+        if (currentUser.getRole().equals("Buyer")) {
+            wishlistView = new WishlistView(currentUser);
+            setupWishlistEventHandlers();
+            wishlistController.loadWishlistItems(wishlistView, currentUser);
+            stage.setScene(wishlistView.getScene());
+            stage.setTitle("CaLouselF - Wishlist");
+        } else {
+            System.out.println("Only buyers can view wishlist");
+        }
+    }
+    
+    private void handleViewPurchaseHistory() {
+        if (currentUser.getRole().equals("Buyer")) {
+            purchaseHistoryView = new PurchaseHistoryView(currentUser);
+            setupPurchaseHistoryEventHandlers();
+            transactionController.loadPurchaseHistory(purchaseHistoryView, currentUser);
+            stage.setScene(purchaseHistoryView.getScene());
+            stage.setTitle("CaLouselF - Purchase History");
+        } else {
+            System.out.println("Only buyers can view purchase history");
+        }
+    }
+    
+    private void handleRefreshItems() {
+        itemController.loadItems(dashboardView, currentUser);
+    }
+    
+    private void loadItems() {
+        itemController.loadItems(dashboardView, currentUser);
+    }
+    
+    private void setupWishlistEventHandlers() {
+        NavigationBar nav = wishlistView.getNavigationBar();
+        nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
+        nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+        wishlistView.getRemoveFromWishlistButton().setOnAction(e -> wishlistController.handleRemoveFromWishlist(wishlistView, currentUser));
+    }
+    
+    private void setupPurchaseHistoryEventHandlers() {
+        NavigationBar nav = purchaseHistoryView.getNavigationBar();
+        nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
+        nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+    }
+    
+    private void setupAdminEventHandlers() {
+        adminView.getApproveButton().setOnAction(e -> adminController.handleApproveItem(adminView));
+        adminView.getDeclineButton().setOnAction(e -> adminController.handleDeclineItem(adminView));
+        adminView.getLogoutButton().setOnAction(e -> handleLogout());
+    }
+    
+    private void showAdminDashboardScene() {
+        this.adminView = new AdminView();
+        setupAdminEventHandlers();
+        adminController.loadPendingItems(adminView);
+        stage.setScene(adminView.getScene());
+        stage.setTitle("CaLouselF - Admin Dashboard");
+    }
+    
 }
 

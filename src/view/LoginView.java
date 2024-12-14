@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
+import main.Main;
 
 public class LoginView {
     private Scene scene;
@@ -22,19 +23,25 @@ public class LoginView {
     private Button loginButton;
     private Button registerButton;
     private Label messageLabel;
+    private NavigationBar navigationBar;
 
     public LoginView() {
         createLoginScene();
     }
 
     private void createLoginScene() {
-        VBox vbox = new VBox(10);
-        vbox.setAlignment(Pos.CENTER);
-        vbox.setPadding(new Insets(25));
+        VBox layout = new VBox(10);
+        
+        // Create NavigationBar with null user (for login page)
+        navigationBar = new NavigationBar(null);
+        
+        VBox contentBox = new VBox(10);
+        contentBox.setAlignment(Pos.CENTER);
+        contentBox.setPadding(new Insets(25));
 
         Text sceneTitle = new Text("Welcome to CaLouselF");
         sceneTitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
-        vbox.getChildren().add(sceneTitle);
+        contentBox.getChildren().add(sceneTitle);
 
         GridPane grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -53,7 +60,7 @@ public class LoginView {
         passwordField = new PasswordField();
         grid.add(passwordField, 1, 1);
 
-        vbox.getChildren().add(grid);
+        contentBox.getChildren().add(grid);
 
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.CENTER);
@@ -62,13 +69,15 @@ public class LoginView {
         registerButton = new Button("Register");
         hbBtn.getChildren().addAll(loginButton, registerButton);
 
-        vbox.getChildren().add(hbBtn);
+        contentBox.getChildren().add(hbBtn);
 
         messageLabel = new Label();
         messageLabel.setTextFill(Color.RED);
-        vbox.getChildren().add(messageLabel);
+        contentBox.getChildren().add(messageLabel);
 
-        scene = new Scene(vbox, 300, 275);
+        layout.getChildren().addAll(navigationBar, contentBox);
+
+        scene = new Scene(layout, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
     }
 
     public Scene getScene() {
@@ -89,6 +98,10 @@ public class LoginView {
 
     public Button getRegisterButton() {
         return registerButton;
+    }
+
+    public NavigationBar getNavigationBar() {
+        return navigationBar;
     }
 
     public void showErrorMessage(String message) {
