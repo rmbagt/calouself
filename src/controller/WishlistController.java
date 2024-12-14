@@ -22,7 +22,7 @@ public class WishlistController {
             ps.setString(1, currentUser.getUser_id());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String itemInfo = rs.getString("item_name") + " - $" + rs.getDouble("price");
+                String itemInfo = rs.getString("item_name") + " - Rp " + rs.getDouble("price");
                 wishlistView.getWishlistItemsView().getItems().add(itemInfo);
             }
         } catch (SQLException e) {

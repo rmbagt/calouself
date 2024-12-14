@@ -50,8 +50,6 @@ public class UserController {
         registerView.getRegisterButton().setOnAction(e -> handleRegister());
         registerView.getBackButton().setOnAction(e -> showLoginScene());
         
-        // Dashboard view handlers
-        
     }
     
     private void setupDashboardEventHandlers() {

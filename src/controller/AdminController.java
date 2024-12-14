@@ -21,7 +21,7 @@ public class AdminController {
             PreparedStatement ps = connect.prepareStatement(query);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String itemInfo = rs.getString("item_name") + " - $" + rs.getDouble("price");
+                String itemInfo = rs.getString("item_name") + " - Rp " + rs.getDouble("price");
                 adminView.getPendingItemsView().getItems().add(itemInfo);
             }
         } catch (SQLException e) {

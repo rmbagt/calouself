@@ -28,7 +28,7 @@ public class TransactionController {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String transactionInfo = rs.getString("transaction_id") + " - " +
-                                         rs.getString("item_name") + " - $" +
+                                         rs.getString("item_name") + " - Rp " +
                                          rs.getDouble("price") + " - " +
                                          rs.getTimestamp("transaction_date");
                 purchaseHistoryView.getPurchaseHistoryView().getItems().add(transactionInfo);
