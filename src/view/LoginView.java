@@ -23,7 +23,6 @@ public class LoginView {
     private Button loginButton;
     private Button registerButton;
     private Label messageLabel;
-    private NavigationBar navigationBar;
 
     public LoginView() {
         createLoginScene();
@@ -31,10 +30,8 @@ public class LoginView {
 
     private void createLoginScene() {
         VBox layout = new VBox(10);
-        
-        // Create NavigationBar with null user (for login page)
-        navigationBar = new NavigationBar(null);
-        
+        layout.setAlignment(Pos.CENTER);
+
         VBox contentBox = new VBox(10);
         contentBox.setAlignment(Pos.CENTER);
         contentBox.setPadding(new Insets(25));
@@ -75,7 +72,6 @@ public class LoginView {
         messageLabel.setTextFill(Color.RED);
         contentBox.getChildren().add(messageLabel);
 
-        layout.getChildren().add(navigationBar);
         layout.getChildren().add(contentBox);
 
         scene = new Scene(layout, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
@@ -99,10 +95,6 @@ public class LoginView {
 
     public Button getRegisterButton() {
         return registerButton;
-    }
-
-    public NavigationBar getNavigationBar() {
-        return navigationBar;
     }
 
     public void showErrorMessage(String message) {

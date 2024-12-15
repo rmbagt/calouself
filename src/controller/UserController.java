@@ -44,7 +44,7 @@ public class UserController {
         // Login view handlers        
         loginView.getRegisterButton().setOnAction(e -> showRegisterScene());
         loginView.getLoginButton().setOnAction(e -> handleLogin());
-        loginView.getNavigationBar().getLogoutMenuItem().setOnAction(e -> showLoginScene());
+        // Navigation for login view is handled differently now
         
         // Register view handlers
         registerView.getRegisterButton().setOnAction(e -> handleRegister());
