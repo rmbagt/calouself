@@ -6,12 +6,16 @@ import java.sql.SQLException;
 import connect.Connect;
 import model.Item;
 import view.AdminView;
+import javafx.stage.Stage;
+import view.LoginView;
 
 public class AdminController {
     private Connect connect;
+    private Stage stage;
 
-    public AdminController() {
+    public AdminController(Stage stage) {
         this.connect = Connect.getInstance();
+        this.stage = stage;
     }
 
     public void loadPendingItems(AdminView adminView) {
@@ -39,7 +43,7 @@ public class AdminController {
         
         String itemName = selectedItem.split(" - ")[0];
         try {
-            String query = "UPDATE items SET status = 'approved' WHERE item_name = ?";
+            String query = "UPDATE items SET status = 'approved' WHERE item_name = ? AND status = 'pending'";
             PreparedStatement ps = connect.prepareStatement(query);
             ps.setString(1, itemName);
             int result = ps.executeUpdate();
@@ -71,13 +75,13 @@ public class AdminController {
         }
         
         try {
-            String query = "DELETE FROM items WHERE item_name = ?";
+            String query = "UPDATE items SET status = 'declined' WHERE item_name = ? AND status = 'pending'";
             PreparedStatement ps = connect.prepareStatement(query);
             ps.setString(1, itemName);
             int result = ps.executeUpdate();
             
             if (result > 0) {
-                adminView.showMessage("Item declined and removed successfully", false);
+                adminView.showMessage("Item declined successfully", false);
                 loadPendingItems(adminView);
                 // TODO: Notify the seller about the declined item and reason
             } else {
@@ -87,6 +91,12 @@ public class AdminController {
             e.printStackTrace();
             adminView.showMessage("Error declining item", true);
         }
+    }
+
+    public void handleLogout() {
+        LoginView loginView = new LoginView();
+        stage.setScene(loginView.getScene());
+        stage.setTitle("CaLouselF - Login");
     }
 }
 

@@ -23,7 +23,7 @@ public class NavigationBar extends MenuBar {
     private void createMenus(User user) {
         // User Menu
         userMenu = new Menu(user != null ? user.getUsername() : "Guest");
-        logoutMenuItem = new MenuItem(user != null ? "Logout" : "Login");
+        logoutMenuItem = new MenuItem("Logout");
         userMenu.getItems().add(logoutMenuItem);
 
         // Items Menu

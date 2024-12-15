@@ -46,7 +46,17 @@ public class TransactionController {
             connect.setAutoCommit(false); // Start transaction
 
             try {
-                // 1. Create transaction record
+                // 1. Check if the item is still available
+                String checkItemQuery = "SELECT * FROM items WHERE item_id = ? AND status = 'approved'";
+                PreparedStatement checkItemPs = connect.prepareStatement(checkItemQuery);
+                checkItemPs.setString(1, itemId);
+                ResultSet itemRs = checkItemPs.executeQuery();
+
+                if (!itemRs.next()) {
+                    throw new SQLException("Item is no longer available for purchase");
+                }
+
+                // 2. Create transaction record
                 String transactionId = UUID.randomUUID().toString();
                 String insertQuery = "INSERT INTO transactions (transaction_id, buyer_id, item_id, transaction_date) VALUES (?, ?, ?, NOW())";
                 PreparedStatement insertPs = connect.prepareStatement(insertQuery);
@@ -55,13 +65,17 @@ public class TransactionController {
                 insertPs.setString(3, itemId);
                 insertPs.executeUpdate();
 
-                // 2. Update item status to 'sold'
+                // 3. Update item status to 'sold'
                 String updateItemQuery = "UPDATE items SET status = 'sold' WHERE item_id = ? AND status = 'approved'";
                 PreparedStatement updatePs = connect.prepareStatement(updateItemQuery);
                 updatePs.setString(1, itemId);
-                updatePs.executeUpdate();
+                int updatedRows = updatePs.executeUpdate();
 
-                // 3. Remove item from all wishlists
+                if (updatedRows == 0) {
+                    throw new SQLException("Failed to update item status");
+                }
+
+                // 4. Remove item from all wishlists
                 String removeFromWishlistQuery = "DELETE FROM wishlist WHERE item_id = ?";
                 PreparedStatement removePs = connect.prepareStatement(removeFromWishlistQuery);
                 removePs.setString(1, itemId);
@@ -77,7 +91,7 @@ public class TransactionController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            System.out.println("Error processing purchase");
+            System.out.println("Error processing purchase: " + e.getMessage());
         }
     }
 }

@@ -17,12 +17,12 @@ public class WishlistController {
     public void loadWishlistItems(WishlistView wishlistView, User currentUser) {
         wishlistView.getWishlistItemsView().getItems().clear();
         try {
-            String query = "SELECT i.item_name, i.price FROM wishlist w JOIN items i ON w.item_id = i.item_id WHERE w.user_id = ?";
+            String query = "SELECT w.wishlist_id, i.item_name, i.price FROM wishlist w JOIN items i ON w.item_id = i.item_id WHERE w.user_id = ?";
             PreparedStatement ps = connect.prepareStatement(query);
             ps.setString(1, currentUser.getUser_id());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String itemInfo = rs.getString("item_name") + " - Rp " + rs.getDouble("price");
+                String itemInfo = rs.getString("wishlist_id") + " - " + rs.getString("item_name") + " - Rp " + rs.getDouble("price");
                 wishlistView.getWishlistItemsView().getItems().add(itemInfo);
             }
         } catch (SQLException e) {
@@ -37,15 +37,15 @@ public class WishlistController {
             wishlistView.showMessage("Please select an item to remove", true);
             return;
         }
-        
-        String itemName = selectedItem.split(" - ")[0];
+    
+        String wishlistId = selectedItem.split(" - ")[0];
         try {
-            String query = "DELETE w FROM wishlist w JOIN items i ON w.item_id = i.item_id WHERE w.user_id = ? AND i.item_name = ?";
+            String query = "DELETE FROM wishlist WHERE wishlist_id = ? AND user_id = ?";
             PreparedStatement ps = connect.prepareStatement(query);
-            ps.setString(1, currentUser.getUser_id());
-            ps.setString(2, itemName);
+            ps.setString(1, wishlistId);
+            ps.setString(2, currentUser.getUser_id());
             int result = ps.executeUpdate();
-            
+        
             if (result > 0) {
                 wishlistView.showMessage("Item removed from wishlist", false);
                 loadWishlistItems(wishlistView, currentUser);

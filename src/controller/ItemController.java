@@ -88,22 +88,35 @@ public class ItemController {
         String itemName = selectedItem.split(" - ")[0];
         try {
             // First, get the item_id
-            String getItemIdQuery = "SELECT item_id FROM items WHERE item_name = ?";
+            String getItemIdQuery = "SELECT item_id FROM items WHERE item_name = ? AND status = 'approved'";
             PreparedStatement getItemIdPs = connect.prepareStatement(getItemIdQuery);
             getItemIdPs.setString(1, itemName);
             ResultSet rs = getItemIdPs.executeQuery();
-            
+        
             if (rs.next()) {
                 String itemId = rs.getString("item_id");
-                
+            
+                // Check if the item is already in the wishlist
+                String checkWishlistQuery = "SELECT * FROM wishlist WHERE user_id = ? AND item_id = ?";
+                PreparedStatement checkWishlistPs = connect.prepareStatement(checkWishlistQuery);
+                checkWishlistPs.setString(1, currentUser.getUser_id());
+                checkWishlistPs.setString(2, itemId);
+                ResultSet wishlistRs = checkWishlistPs.executeQuery();
+            
+                if (wishlistRs.next()) {
+                    dashboardView.showMessage("Item is already in your wishlist", true);
+                    return;
+                }
+            
                 // Now, add to wishlist
-                String addToWishlistQuery = "INSERT INTO wishlist (user_id, item_id) VALUES (?, ?)";
+                String addToWishlistQuery = "INSERT INTO wishlist (wishlist_id, user_id, item_id) VALUES (?, ?, ?)";
                 PreparedStatement addToWishlistPs = connect.prepareStatement(addToWishlistQuery);
-                addToWishlistPs.setString(1, currentUser.getUser_id());
-                addToWishlistPs.setString(2, itemId);
-                
+                addToWishlistPs.setString(1, UUID.randomUUID().toString());
+                addToWishlistPs.setString(2, currentUser.getUser_id());
+                addToWishlistPs.setString(3, itemId);
+            
                 int result = addToWishlistPs.executeUpdate();
-                
+            
                 if (result > 0) {
                     dashboardView.showMessage("Item added to wishlist", false);
                 } else {

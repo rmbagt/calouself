@@ -34,7 +34,7 @@ public class UserController {
         this.itemController = new ItemController();
         this.wishlistController = new WishlistController();
         this.transactionController = new TransactionController();
-        this.adminController = new AdminController();
+        this.adminController = new AdminController(stage);
         
         setupEventHandlers();
         showLoginScene();
@@ -314,7 +314,10 @@ public class UserController {
     private void setupAdminEventHandlers() {
         adminView.getApproveButton().setOnAction(e -> adminController.handleApproveItem(adminView));
         adminView.getDeclineButton().setOnAction(e -> adminController.handleDeclineItem(adminView));
-        adminView.getLogoutButton().setOnAction(e -> handleLogout());
+        adminView.getNavigationBar().getLogoutMenuItem().setOnAction(e -> {
+            adminController.handleLogout();
+            showLoginScene();
+        });
     }
     
     private void showAdminDashboardScene() {
@@ -349,7 +352,7 @@ public class UserController {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            dashboardView.showMessage("Error processing purchase", true);
+            dashboardView.showMessage("Error processing purchase: " + e.getMessage(), true);
         }
     }
     
