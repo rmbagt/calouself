@@ -58,19 +58,23 @@ public class UserController {
         NavigationBar nav = dashboardView.getNavigationBar();
         nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
         nav.getBrowseItemsMenuItem().setOnAction(e -> handleBrowseItems());
-        if (nav.getUploadItemMenuItem() != null) {
-            nav.getUploadItemMenuItem().setOnAction(e -> handleUploadItem());
-        }
-        if (nav.getViewWishlistMenuItem() != null) {
-            nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
-        }
-        nav.getViewPurchaseHistoryMenuItem().setOnAction(e -> handleViewPurchaseHistory());
-        dashboardView.getRefreshButton().setOnAction(e -> handleRefreshItems());
         
-        if (currentUser.getRole().equals("Buyer")) {
+        if (currentUser.getRole().equals("Seller")) {
+            if (nav.getUploadItemMenuItem() != null) {
+                nav.getUploadItemMenuItem().setOnAction(e -> handleUploadItem());
+            }
+        } else if (currentUser.getRole().equals("Buyer")) {
+            if (nav.getViewWishlistMenuItem() != null) {
+                nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
+            }
+            if (nav.getViewPurchaseHistoryMenuItem() != null) {
+                nav.getViewPurchaseHistoryMenuItem().setOnAction(e -> handleViewPurchaseHistory());
+            }
             dashboardView.getAddToWishlistButton().setOnAction(e -> handleAddToWishlist());
             dashboardView.getPurchaseButton().setOnAction(e -> handlePurchaseItem());
         }
+        
+        dashboardView.getRefreshButton().setOnAction(e -> handleRefreshItems());
     }
     
     private void setupUploadItemEventHandlers() {
@@ -302,6 +306,9 @@ public class UserController {
         NavigationBar nav = wishlistView.getNavigationBar();
         nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
         nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+        if (nav.getViewPurchaseHistoryMenuItem() != null) {
+            nav.getViewPurchaseHistoryMenuItem().setOnAction(e -> handleViewPurchaseHistory());
+        }
         wishlistView.getRemoveFromWishlistButton().setOnAction(e -> wishlistController.handleRemoveFromWishlist(wishlistView, currentUser));
     }
     
@@ -309,6 +316,9 @@ public class UserController {
         NavigationBar nav = purchaseHistoryView.getNavigationBar();
         nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
         nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+        if (nav.getViewWishlistMenuItem() != null) {
+            nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
+        }
     }
     
     private void setupAdminEventHandlers() {

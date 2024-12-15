@@ -43,8 +43,8 @@ public class NavigationBar extends MenuBar {
             wishlistMenu.getItems().add(viewWishlistMenuItem);
         }
 
-        // History Menu (only for logged-in users)
-        if (user != null) {
+        // History Menu (only for logged-in Buyers)
+        if (user != null && "Buyer".equals(user.getRole())) {
             historyMenu = new Menu("History");
             viewPurchaseHistoryMenuItem = new MenuItem("View Purchase History");
             historyMenu.getItems().add(viewPurchaseHistoryMenuItem);
