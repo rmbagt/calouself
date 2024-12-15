@@ -94,6 +94,10 @@ public class UserController {
         nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
         nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
         uploadItemView.getUploadButton().setOnAction(e -> handleItemUpload());
+        
+        if (nav.getViewOffersMenuItem() != null) {
+            nav.getViewOffersMenuItem().setOnAction(e -> handleViewOffers());
+        }
     }
     
     private void showLoginScene() {
@@ -485,25 +489,45 @@ public class UserController {
                 makeOfferView.getOfferPriceField().getText(),
                 makeOfferView
             );
+            if (!makeOfferView.getMessageLabel().getText().startsWith("Error")) {
+                showDashboardScene(currentUser);
+            }
         });
 
         makeOfferView.getCancelButton().setOnAction(e -> showDashboardScene(currentUser));
-        makeOfferView.getNavigationBar().getLogoutMenuItem().setOnAction(e -> handleLogout());
-        makeOfferView.getNavigationBar().getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+        
+        NavigationBar nav = makeOfferView.getNavigationBar();
+        nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
+        nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+        
+        if (nav.getViewWishlistMenuItem() != null) {
+            nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
+        }
+        if (nav.getViewPurchaseHistoryMenuItem() != null) {
+            nav.getViewPurchaseHistoryMenuItem().setOnAction(e -> handleViewPurchaseHistory());
+        }
     }
 
     private void handleViewOffers() {
-        offeredItemsView = new OfferedItemsView(currentUser);
-        setupOfferedItemsEventHandlers();
-        offerController.loadOfferedItems(offeredItemsView, currentUser);
-        stage.setScene(offeredItemsView.getScene());
-        stage.setTitle("CaLouselF - View Offers");
+        if (currentUser.getRole().equals("Seller")) {
+            offeredItemsView = new OfferedItemsView(currentUser);
+            setupOfferedItemsEventHandlers();
+            offerController.loadOfferedItems(offeredItemsView, currentUser);
+            stage.setScene(offeredItemsView.getScene());
+            stage.setTitle("CaLouselF - View Offers");
+        } else {
+            System.out.println("Only sellers can view offers");
+        }
     }
 
     private void setupOfferedItemsEventHandlers() {
         NavigationBar nav = offeredItemsView.getNavigationBar();
         nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
         nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+
+        if (nav.getUploadItemMenuItem() != null) {
+            nav.getUploadItemMenuItem().setOnAction(e -> handleUploadItem());
+        }
 
         offeredItemsView.getAcceptOfferButton().setOnAction(e -> {
             String selectedOffer = offeredItemsView.getOfferedItemsView().getSelectionModel().getSelectedItem();

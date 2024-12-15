@@ -36,6 +36,10 @@ public class NavigationBar extends MenuBar {
         if (user != null && "Seller".equals(user.getRole())) {
             uploadItemMenuItem = new MenuItem("Upload Item");
             itemsMenu.getItems().add(uploadItemMenuItem);
+
+            offersMenu = new Menu("Offers");
+            viewOffersMenuItem = new MenuItem("View Offers");
+            offersMenu.getItems().add(viewOffersMenuItem);
         }
 
         // Wishlist Menu (only for logged-in Buyers)
@@ -52,12 +56,8 @@ public class NavigationBar extends MenuBar {
             historyMenu.getItems().add(viewPurchaseHistoryMenuItem);
         }
 
-        if (user != null && "Seller".equals(user.getRole())) {
-            offersMenu = new Menu("Offers");
-            viewOffersMenuItem = new MenuItem("View Offers");
-            offersMenu.getItems().add(viewOffersMenuItem);
-            this.getMenus().add(offersMenu);
-        }
+        // Offers Menu (only for logged-in Sellers)
+        
 
         // Add all menus to the menu bar
         this.getMenus().addAll(userMenu, itemsMenu);
@@ -67,6 +67,9 @@ public class NavigationBar extends MenuBar {
         if (historyMenu != null) {
             this.getMenus().add(historyMenu);
         }
+        if (offersMenu != null) {
+            this.getMenus().add(offersMenu);
+        }
     }
 
     // Getters for menu items
@@ -75,8 +78,6 @@ public class NavigationBar extends MenuBar {
     public MenuItem getUploadItemMenuItem() { return uploadItemMenuItem; }
     public MenuItem getViewWishlistMenuItem() { return viewWishlistMenuItem; }
     public MenuItem getViewPurchaseHistoryMenuItem() { return viewPurchaseHistoryMenuItem; }
-    public MenuItem getViewOffersMenuItem() {
-        return viewOffersMenuItem;
-    }
+    public MenuItem getViewOffersMenuItem() { return viewOffersMenuItem; }
 }
 

@@ -75,6 +75,7 @@ public class MakeOfferView {
     public TextField getOfferPriceField() { return offerPriceField; }
     public Button getSubmitOfferButton() { return submitOfferButton; }
     public Button getCancelButton() { return cancelButton; }
+    public Label getMessageLabel() { return messageLabel; }
 
     public void showMessage(String message, boolean isError) {
         messageLabel.setText(message);

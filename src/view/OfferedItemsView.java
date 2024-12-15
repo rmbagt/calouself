@@ -51,7 +51,7 @@ public class OfferedItemsView {
 
         declineReasonField = new TextField();
         declineReasonField.setPromptText("Enter reason for declining offer");
-        declineReasonField.setVisible(false);
+        declineReasonField.setPrefWidth(300);
 
         messageLabel = new Label();
         messageLabel.setWrapText(true);
@@ -60,6 +60,7 @@ public class OfferedItemsView {
             titleLabel,
             offeredItemsView,
             buttonBox,
+            new Label("Reason for declining:"),
             declineReasonField,
             messageLabel
         );
@@ -73,11 +74,6 @@ public class OfferedItemsView {
             boolean hasSelection = newSelection != null;
             acceptOfferButton.setDisable(!hasSelection);
             declineOfferButton.setDisable(!hasSelection);
-        });
-
-        // Show/hide decline reason field based on decline button
-        declineOfferButton.setOnAction(e -> {
-            declineReasonField.setVisible(true);
         });
     }
 
