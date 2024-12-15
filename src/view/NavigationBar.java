@@ -15,6 +15,8 @@ public class NavigationBar extends MenuBar {
     private MenuItem viewWishlistMenuItem;
     private Menu historyMenu;
     private MenuItem viewPurchaseHistoryMenuItem;
+    private Menu offersMenu;
+    private MenuItem viewOffersMenuItem;
 
     public NavigationBar(User user) {
         createMenus(user);
@@ -50,6 +52,13 @@ public class NavigationBar extends MenuBar {
             historyMenu.getItems().add(viewPurchaseHistoryMenuItem);
         }
 
+        if (user != null && "Seller".equals(user.getRole())) {
+            offersMenu = new Menu("Offers");
+            viewOffersMenuItem = new MenuItem("View Offers");
+            offersMenu.getItems().add(viewOffersMenuItem);
+            this.getMenus().add(offersMenu);
+        }
+
         // Add all menus to the menu bar
         this.getMenus().addAll(userMenu, itemsMenu);
         if (wishlistMenu != null) {
@@ -66,5 +75,8 @@ public class NavigationBar extends MenuBar {
     public MenuItem getUploadItemMenuItem() { return uploadItemMenuItem; }
     public MenuItem getViewWishlistMenuItem() { return viewWishlistMenuItem; }
     public MenuItem getViewPurchaseHistoryMenuItem() { return viewPurchaseHistoryMenuItem; }
+    public MenuItem getViewOffersMenuItem() {
+        return viewOffersMenuItem;
+    }
 }
 

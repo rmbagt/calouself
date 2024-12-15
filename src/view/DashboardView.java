@@ -20,6 +20,7 @@ public class DashboardView {
     private Label messageLabel;
     private Button editItemButton;
     private Button deleteItemButton;
+    private Button makeOfferButton;
 
     public DashboardView(User user) {
         createDashboardScene(user);
@@ -54,6 +55,10 @@ public class DashboardView {
             purchaseButton = new Button("Purchase");
             purchaseButton.setDisable(true);
             purchaseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5;");
+            
+            makeOfferButton = new Button("Make Offer");
+            makeOfferButton.setDisable(true);
+            makeOfferButton.setStyle("-fx-background-color: #FFA500; -fx-text-fill: white; -fx-background-radius: 5;");
         } else if (user.getRole().equals("Seller")) {
             editItemButton = new Button("Edit Item");
             editItemButton.setDisable(true);
@@ -104,7 +109,7 @@ public class DashboardView {
         contentBox.getChildren().addAll(welcomeLabel, itemListView, refreshButton);
         if (user.getRole().equals("Buyer")) {
             HBox buttonBox = new HBox(10);
-            buttonBox.getChildren().addAll(addToWishlistButton, purchaseButton);
+            buttonBox.getChildren().addAll(addToWishlistButton, purchaseButton, makeOfferButton);
             contentBox.getChildren().add(buttonBox);
         }
         contentBox.getChildren().add(messageLabel);
@@ -119,6 +124,7 @@ public class DashboardView {
                 boolean hasSelection = newSelection != null;
                 addToWishlistButton.setDisable(!hasSelection);
                 purchaseButton.setDisable(!hasSelection);
+                makeOfferButton.setDisable(!hasSelection);
             });
         }
     }
@@ -166,6 +172,10 @@ public class DashboardView {
 
     public Button getDeleteItemButton() {
         return deleteItemButton;
+    }
+
+    public Button getMakeOfferButton() {
+        return makeOfferButton;
     }
 }
 

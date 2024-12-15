@@ -27,6 +27,9 @@ public class UserController {
     private TransactionController transactionController;
     private AdminController adminController;
     private EditItemView editItemView;
+    private OfferController offerController;
+    private MakeOfferView makeOfferView;
+    private OfferedItemsView offeredItemsView;
     
     public UserController(Stage stage) {
         this.stage = stage;
@@ -37,6 +40,7 @@ public class UserController {
         this.wishlistController = new WishlistController();
         this.transactionController = new TransactionController();
         this.adminController = new AdminController(stage);
+        this.offerController = new OfferController();
         
         setupEventHandlers();
         showLoginScene();
@@ -67,6 +71,9 @@ public class UserController {
             }
             dashboardView.getEditItemButton().setOnAction(e -> handleEditItem());
             dashboardView.getDeleteItemButton().setOnAction(e -> handleDeleteItem());
+            if (nav.getViewOffersMenuItem() != null) {
+                nav.getViewOffersMenuItem().setOnAction(e -> handleViewOffers());
+            }
         } else if (currentUser.getRole().equals("Buyer")) {
             if (nav.getViewWishlistMenuItem() != null) {
                 nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
@@ -76,6 +83,7 @@ public class UserController {
             }
             dashboardView.getAddToWishlistButton().setOnAction(e -> handleAddToWishlist());
             dashboardView.getPurchaseButton().setOnAction(e -> handlePurchaseItem());
+            dashboardView.getMakeOfferButton().setOnAction(e -> handleMakeOffer());
         }
         
         dashboardView.getRefreshButton().setOnAction(e -> handleRefreshItems());
@@ -426,6 +434,93 @@ public class UserController {
         }
 
         itemController.deleteItem(itemId, dashboardView, currentUser);
+    }
+
+    private void handleMakeOffer() {
+        String selectedItem = dashboardView.getItemListView().getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            dashboardView.showMessage("Please select an item to make an offer", true);
+            return;
+        }
+
+        String[] itemParts = selectedItem.split(" - ");
+        String itemId = itemParts[0];
+
+        try {
+            String query = "SELECT * FROM items WHERE item_id = ? AND status = 'approved'";
+            PreparedStatement ps = connect.prepareStatement(query);
+            ps.setString(1, itemId);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                Item item = new Item(
+                    rs.getString("item_id"),
+                    rs.getString("seller_id"),
+                    rs.getString("item_name"),
+                    rs.getString("category"),
+                    rs.getString("size"),
+                    rs.getDouble("price"),
+                    rs.getString("status")
+                );
+
+                double highestOffer = offerController.getHighestOffer(itemId);
+                makeOfferView = new MakeOfferView(currentUser, item, highestOffer);
+                setupMakeOfferEventHandlers(item);
+                stage.setScene(makeOfferView.getScene());
+                stage.setTitle("CaLouselF - Make Offer");
+            } else {
+                dashboardView.showMessage("Item not available for offers", true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            dashboardView.showMessage("Error loading item details", true);
+        }
+    }
+
+    private void setupMakeOfferEventHandlers(Item item) {
+        makeOfferView.getSubmitOfferButton().setOnAction(e -> {
+            offerController.makeOffer(
+                item.getItem_id(),
+                currentUser,
+                makeOfferView.getOfferPriceField().getText(),
+                makeOfferView
+            );
+        });
+
+        makeOfferView.getCancelButton().setOnAction(e -> showDashboardScene(currentUser));
+        makeOfferView.getNavigationBar().getLogoutMenuItem().setOnAction(e -> handleLogout());
+        makeOfferView.getNavigationBar().getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+    }
+
+    private void handleViewOffers() {
+        offeredItemsView = new OfferedItemsView(currentUser);
+        setupOfferedItemsEventHandlers();
+        offerController.loadOfferedItems(offeredItemsView, currentUser);
+        stage.setScene(offeredItemsView.getScene());
+        stage.setTitle("CaLouselF - View Offers");
+    }
+
+    private void setupOfferedItemsEventHandlers() {
+        NavigationBar nav = offeredItemsView.getNavigationBar();
+        nav.getLogoutMenuItem().setOnAction(e -> handleLogout());
+        nav.getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+
+        offeredItemsView.getAcceptOfferButton().setOnAction(e -> {
+            String selectedOffer = offeredItemsView.getOfferedItemsView().getSelectionModel().getSelectedItem();
+            if (selectedOffer != null) {
+                String offerId = selectedOffer.split(" - ")[0];
+                offerController.acceptOffer(offerId, offeredItemsView);
+            }
+        });
+
+        offeredItemsView.getDeclineOfferButton().setOnAction(e -> {
+            String selectedOffer = offeredItemsView.getOfferedItemsView().getSelectionModel().getSelectedItem();
+            if (selectedOffer != null) {
+                String offerId = selectedOffer.split(" - ")[0];
+                String reason = offeredItemsView.getDeclineReasonField().getText();
+                offerController.declineOffer(offerId, reason, offeredItemsView, currentUser);
+            }
+        });
     }
 }
 
