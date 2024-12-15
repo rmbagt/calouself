@@ -345,7 +345,8 @@ public class UserController {
             return;
         }
 
-        String itemName = selectedItem.split(" - ")[0];
+        String[] itemParts = selectedItem.split(" - ");
+        String itemName = itemParts[0];
         try {
             String query = "SELECT item_id FROM items WHERE item_name = ? AND status = 'approved'";
             PreparedStatement ps = connect.prepareStatement(query);

@@ -70,6 +70,9 @@ public class ItemController {
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 String itemInfo = rs.getString("item_name") + " - Rp " + rs.getDouble("price");
+                if (currentUser.getRole().equals("Seller")) {
+                    itemInfo += " - Status: " + rs.getString("status");
+                }
                 dashboardView.getItemListView().getItems().add(itemInfo);
             }
         } catch (SQLException e) {

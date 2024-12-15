@@ -76,6 +76,30 @@ public class DashboardView {
                 addToWishlistButton.setDisable(!hasSelection);
                 purchaseButton.setDisable(!hasSelection);
             });
+        } else if (user.getRole().equals("Seller")) {
+            itemListView.setCellFactory(lv -> new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        if (item.contains("Status: pending")) {
+                            setStyle("-fx-text-fill: orange;");
+                        } else if (item.contains("Status: approved")) {
+                            setStyle("-fx-text-fill: green;");
+                        } else if (item.contains("Status: sold")) {
+                            setStyle("-fx-text-fill: blue;");
+                        } else if (item.contains("Status: declined")) {
+                            setStyle("-fx-text-fill: red;");
+                        } else {
+                            setStyle("");
+                        }
+                    }
+                }
+            });
         }
     }
 
