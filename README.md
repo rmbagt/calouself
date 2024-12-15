@@ -103,11 +103,11 @@ git clone https://github.com/reynaldomarchell/calouself.git
 mysql -u root -p < /[Documentation_SQL]/calouself.sql
 ```
 
-3. Configure database connection
+4. Configure database connection
 
 - Update the database connection settings in `connect/Connect.java`
 
-4. Compile and run
+5. Compile and run
 
 ```shellscript
 javac Main.java
