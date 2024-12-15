@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost
--- Generation Time: Dec 15, 2024 at 10:21 AM
+-- Generation Time: Dec 15, 2024 at 10:51 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -45,6 +45,7 @@ INSERT INTO `items` (`item_id`, `seller_id`, `item_name`, `category`, `size`, `p
 ('6c2c3d7e-7fa7-4dcd-82a4-cdc8a2df9f49', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Air Jordan', 'Shoes', '40', 3000000.00, 'declined'),
 ('78ee2711-7f0c-4df7-b7aa-d91d967af573', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Air Jordan', 'Shoes', '45', 2000000.00, 'approved'),
 ('85471411-7059-4d04-b533-bbde4f59fcbf', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Uniqlo Shirt', 'Shirt', 'XL', 100000.00, 'declined'),
+('95fac716-b5fc-435b-9f89-12fc12ff6661', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Supreme Shirt', 'Shirt', 'L', 150000.00, 'pending'),
 ('da646d02-8ecd-4a35-a902-9fe1648d6725', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Air Jordan', 'Shoes', '40', 2000000.00, 'sold'),
 ('f8d70910-60e8-49f4-a9f6-f2dd8729ebbe', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Nike', 'Shoes', '41', 2000000.00, 'sold'),
 ('f8e116df-4d73-4fbc-bcef-a6f184613929', 'dd2fef21-4630-407c-8947-87a14fad112c', 'Supreme Hat', 'Hat', 'S', 20000.00, 'sold');
