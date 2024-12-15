@@ -58,9 +58,9 @@ CaLouselF is a Java-based e-commerce application that facilitates buying and sel
 
 ### Seller Interface
 
-| Edit Item                                              | View Offers                                               |
-| ------------------------------------------------------ | --------------------------------------------------------- |
-| ![Edit Item](/[Documentation_SQL]/img/seller_edit.png) | ![View Offers](/[Documentation_SQL]/img/seller_offer.png) |
+| Upload Item                                                | Edit Item                                              | View Offers                                               |
+| ---------------------------------------------------------- | ------------------------------------------------------ | --------------------------------------------------------- |
+| ![Upload Item](/[Documentation_SQL]/img/seller_upload.png) | ![Edit Item](/[Documentation_SQL]/img/seller_edit.png) | ![View Offers](/[Documentation_SQL]/img/seller_offer.png) |
 
 ## Technical Requirements
 
@@ -89,7 +89,15 @@ The application uses the following main tables:
 git clone https://github.com/reynaldomarchell/calouself.git
 ```
 
-2. Set up the MySQL database
+2. Add JavaFX and MySQL Java Connection Library to the project
+
+   Using Eclipse:
+
+- Right click on project folder -> Build Path -> Configure Build Path...
+- On Libraries tab, click on Modulepath -> Add Library -> User Library
+- Check JavaFX and MySQL and then apply changes
+
+3. Set up the MySQL database
 
 ```shellscript
 mysql -u root -p < /[Documentation_SQL]/calouself.sql
