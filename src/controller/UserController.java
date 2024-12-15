@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.UUID;
 import connect.Connect;
 import model.User;
+import model.Item;
 import view.*;
 import javafx.scene.control.*;
 import javafx.stage.Stage;
@@ -25,6 +26,7 @@ public class UserController {
     private WishlistController wishlistController;
     private TransactionController transactionController;
     private AdminController adminController;
+    private EditItemView editItemView;
     
     public UserController(Stage stage) {
         this.stage = stage;
@@ -63,6 +65,8 @@ public class UserController {
             if (nav.getUploadItemMenuItem() != null) {
                 nav.getUploadItemMenuItem().setOnAction(e -> handleUploadItem());
             }
+            dashboardView.getEditItemButton().setOnAction(e -> handleEditItem());
+            dashboardView.getDeleteItemButton().setOnAction(e -> handleDeleteItem());
         } else if (currentUser.getRole().equals("Buyer")) {
             if (nav.getViewWishlistMenuItem() != null) {
                 nav.getViewWishlistMenuItem().setOnAction(e -> handleViewWishlist());
@@ -346,18 +350,21 @@ public class UserController {
         }
 
         String[] itemParts = selectedItem.split(" - ");
-        String itemName = itemParts[0];
+        String itemId = itemParts[0]; // The item ID is now the first part
         try {
-            String query = "SELECT item_id FROM items WHERE item_name = ? AND status = 'approved'";
+            String query = "SELECT * FROM items WHERE item_id = ? AND status = 'approved'";
             PreparedStatement ps = connect.prepareStatement(query);
-            ps.setString(1, itemName);
+            ps.setString(1, itemId);
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
-                String itemId = rs.getString("item_id");
-                transactionController.handlePurchaseItem(itemId, currentUser);
-                dashboardView.showMessage("Purchase successful!", false);
-                handleRefreshItems(); // Refresh the items list
+                try {
+                    transactionController.handlePurchaseItem(itemId, currentUser);
+                    dashboardView.showMessage("Purchase successful!", false);
+                    handleRefreshItems(); // Refresh the items list
+                } catch (RuntimeException e) {
+                    dashboardView.showMessage("Error processing purchase: " + e.getMessage(), true);
+                }
             } else {
                 dashboardView.showMessage("Item not available for purchase", true);
             }
@@ -367,5 +374,58 @@ public class UserController {
         }
     }
     
+
+    private void handleEditItem() {
+        String selectedItem = dashboardView.getItemListView().getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            dashboardView.showMessage("Please select an item to edit", true);
+            return;
+        }
+
+        String[] itemParts = selectedItem.split(" - ");
+        String itemId = itemParts[0];
+        Item item = itemController.getItemById(itemId, currentUser);
+        if (item != null) {
+            editItemView = new EditItemView(currentUser, item);
+            setupEditItemEventHandlers(item);
+            stage.setScene(editItemView.getScene());
+            stage.setTitle("CaLouselF - Edit Item");
+        } else {
+            dashboardView.showMessage("Error loading item details", true);
+        }
+    }
+
+    private void setupEditItemEventHandlers(Item item) {
+        editItemView.getSaveButton().setOnAction(e -> {
+            itemController.editItem(
+                item.getItem_id(),
+                editItemView.getItemNameField().getText(),
+                editItemView.getItemCategoryField().getText(),
+                editItemView.getItemSizeField().getText(),
+                editItemView.getItemPriceField().getText(),
+                editItemView
+            );
+        });
+        editItemView.getCancelButton().setOnAction(e -> showDashboardScene(currentUser));
+        editItemView.getNavigationBar().getLogoutMenuItem().setOnAction(e -> handleLogout());
+        editItemView.getNavigationBar().getBrowseItemsMenuItem().setOnAction(e -> showDashboardScene(currentUser));
+    }
+
+    private void handleDeleteItem() {
+        String selectedItem = dashboardView.getItemListView().getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            dashboardView.showMessage("Please select an item to delete", true);
+            return;
+        }
+
+        String[] itemParts = selectedItem.split(" - ");
+        String itemId = itemParts[0];
+        if (!selectedItem.contains("Status: approved")) {
+            dashboardView.showMessage("Only approved items can be deleted", true);
+            return;
+        }
+
+        itemController.deleteItem(itemId, dashboardView, currentUser);
+    }
 }
 

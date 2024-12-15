@@ -37,19 +37,27 @@ public class Item {
 
     // Validation methods
     public static boolean validateItemName(String name) {
-        return name != null && name.length() >= 3;
+        return name != null && !name.trim().isEmpty() && name.length() >= 3;
     }
 
     public static boolean validateCategory(String category) {
-        return category != null && category.length() >= 3;
+        return category != null && !category.trim().isEmpty() && category.length() >= 3;
     }
 
     public static boolean validateSize(String size) {
         return size != null && !size.trim().isEmpty();
     }
 
-    public static boolean validatePrice(double price) {
-        return price > 0;
+    public static boolean validatePrice(String price) {
+        if (price == null || price.trim().isEmpty()) {
+            return false;
+        }
+        try {
+            double priceValue = Double.parseDouble(price);
+            return priceValue > 0;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }
 

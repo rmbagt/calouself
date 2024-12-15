@@ -18,6 +18,8 @@ public class DashboardView {
     private Button addToWishlistButton;
     private Button purchaseButton;
     private Label messageLabel;
+    private Button editItemButton;
+    private Button deleteItemButton;
 
     public DashboardView(User user) {
         createDashboardScene(user);
@@ -52,6 +54,48 @@ public class DashboardView {
             purchaseButton = new Button("Purchase");
             purchaseButton.setDisable(true);
             purchaseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5;");
+        } else if (user.getRole().equals("Seller")) {
+            editItemButton = new Button("Edit Item");
+            editItemButton.setDisable(true);
+            editItemButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5;");
+    
+            deleteItemButton = new Button("Delete Item");
+            deleteItemButton.setDisable(true);
+            deleteItemButton.setStyle("-fx-background-color: #f44336; -fx-text-fill: white; -fx-background-radius: 5;");
+    
+            HBox buttonBox = new HBox(10);
+            buttonBox.getChildren().addAll(editItemButton, deleteItemButton);
+            contentBox.getChildren().add(buttonBox);
+
+            itemListView.setCellFactory(lv -> new ListCell<String>() {
+                @Override
+                protected void updateItem(String item, boolean empty) {
+                    super.updateItem(item, empty);
+                    if (empty || item == null) {
+                        setText(null);
+                        setStyle("");
+                    } else {
+                        setText(item);
+                        if (item.contains("Status: pending")) {
+                            setStyle("-fx-text-fill: orange;");
+                        } else if (item.contains("Status: approved")) {
+                            setStyle("-fx-text-fill: green;");
+                        } else if (item.contains("Status: sold")) {
+                            setStyle("-fx-text-fill: blue;");
+                        } else if (item.contains("Status: declined")) {
+                            setStyle("-fx-text-fill: red;");
+                        } else {
+                            setStyle("");
+                        }
+                    }
+                }
+            });
+
+            itemListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+                boolean isApproved = newSelection != null && newSelection.contains("Status: approved");
+                editItemButton.setDisable(!isApproved);
+                deleteItemButton.setDisable(!isApproved);
+            });
         }
 
         messageLabel = new Label();
@@ -75,30 +119,6 @@ public class DashboardView {
                 boolean hasSelection = newSelection != null;
                 addToWishlistButton.setDisable(!hasSelection);
                 purchaseButton.setDisable(!hasSelection);
-            });
-        } else if (user.getRole().equals("Seller")) {
-            itemListView.setCellFactory(lv -> new ListCell<String>() {
-                @Override
-                protected void updateItem(String item, boolean empty) {
-                    super.updateItem(item, empty);
-                    if (empty || item == null) {
-                        setText(null);
-                        setStyle("");
-                    } else {
-                        setText(item);
-                        if (item.contains("Status: pending")) {
-                            setStyle("-fx-text-fill: orange;");
-                        } else if (item.contains("Status: approved")) {
-                            setStyle("-fx-text-fill: green;");
-                        } else if (item.contains("Status: sold")) {
-                            setStyle("-fx-text-fill: blue;");
-                        } else if (item.contains("Status: declined")) {
-                            setStyle("-fx-text-fill: red;");
-                        } else {
-                            setStyle("");
-                        }
-                    }
-                }
             });
         }
     }
@@ -138,6 +158,14 @@ public class DashboardView {
 
     public void clearMessage() {
         messageLabel.setText("");
+    }
+
+    public Button getEditItemButton() {
+        return editItemButton;
+    }
+
+    public Button getDeleteItemButton() {
+        return deleteItemButton;
     }
 }
 
