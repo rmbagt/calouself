@@ -67,7 +67,8 @@ public class UploadItemView {
             messageLabel
         );
 
-        layout.getChildren().addAll(navigationBar, contentBox);
+        layout.getChildren().add(navigationBar);
+        layout.getChildren().add(contentBox);
 
         scene = new Scene(layout, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
     }

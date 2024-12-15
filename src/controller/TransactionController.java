@@ -27,10 +27,12 @@ public class TransactionController {
             ps.setString(1, currentUser.getUser_id());
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                String transactionInfo = rs.getString("transaction_id") + " - " +
-                                         rs.getString("item_name") + " - Rp " +
-                                         rs.getDouble("price") + " - " +
-                                         rs.getTimestamp("transaction_date");
+                String transactionInfo = String.format("%s - %s - Rp %.2f - %s",
+                    rs.getString("transaction_id"),
+                    rs.getString("item_name"),
+                    rs.getDouble("price"),
+                    rs.getTimestamp("transaction_date").toString()
+                );
                 purchaseHistoryView.getPurchaseHistoryView().getItems().add(transactionInfo);
             }
         } catch (SQLException e) {
@@ -41,31 +43,37 @@ public class TransactionController {
 
     public void handlePurchaseItem(String itemId, User buyer) {
         try {
-            String transactionId = UUID.randomUUID().toString();
-            String query = "INSERT INTO transactions (transaction_id, item_id, buyer_id, transaction_date) VALUES (?, ?, ?, NOW())";
-            PreparedStatement ps = connect.prepareStatement(query);
-            ps.setString(1, transactionId);
-            ps.setString(2, itemId);
-            ps.setString(3, buyer.getUser_id());
-            
-            int result = ps.executeUpdate();
-            
-            if (result > 0) {
-                // Update item status to 'sold'
-                String updateItemQuery = "UPDATE items SET status = 'sold' WHERE item_id = ?";
+            connect.setAutoCommit(false); // Start transaction
+
+            try {
+                // 1. Create transaction record
+                String transactionId = UUID.randomUUID().toString();
+                String insertQuery = "INSERT INTO transactions (transaction_id, buyer_id, item_id, transaction_date) VALUES (?, ?, ?, NOW())";
+                PreparedStatement insertPs = connect.prepareStatement(insertQuery);
+                insertPs.setString(1, transactionId);
+                insertPs.setString(2, buyer.getUser_id());
+                insertPs.setString(3, itemId);
+                insertPs.executeUpdate();
+
+                // 2. Update item status to 'sold'
+                String updateItemQuery = "UPDATE items SET status = 'sold' WHERE item_id = ? AND status = 'approved'";
                 PreparedStatement updatePs = connect.prepareStatement(updateItemQuery);
                 updatePs.setString(1, itemId);
                 updatePs.executeUpdate();
-                
-                // Remove item from all wishlists
+
+                // 3. Remove item from all wishlists
                 String removeFromWishlistQuery = "DELETE FROM wishlist WHERE item_id = ?";
                 PreparedStatement removePs = connect.prepareStatement(removeFromWishlistQuery);
                 removePs.setString(1, itemId);
                 removePs.executeUpdate();
-                
+
+                connect.commit(); // Commit transaction
                 System.out.println("Purchase successful");
-            } else {
-                System.out.println("Purchase failed");
+            } catch (SQLException e) {
+                connect.rollback(); // Rollback on error
+                throw e;
+            } finally {
+                connect.setAutoCommit(true); // Reset auto-commit
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -37,12 +37,9 @@ public class DashboardView {
 
         itemListView = new ListView<>();
         itemListView.setPrefHeight(400);
-        
-        // Style the ListView with a blue border
         itemListView.setStyle("-fx-border-color: #00bfff; -fx-border-width: 1px;");
 
         refreshButton = new Button("Refresh Items");
-        // Style the button
         refreshButton.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 5;");
 
         addToWishlistButton = null;
@@ -50,8 +47,11 @@ public class DashboardView {
         if (user.getRole().equals("Buyer")) {
             addToWishlistButton = new Button("Add to Wishlist");
             addToWishlistButton.setDisable(true);
+            addToWishlistButton.setStyle("-fx-background-color: #f0f0f0; -fx-background-radius: 5;");
+            
             purchaseButton = new Button("Purchase");
             purchaseButton.setDisable(true);
+            purchaseButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5;");
         }
 
         messageLabel = new Label();
@@ -59,19 +59,22 @@ public class DashboardView {
 
         contentBox.getChildren().addAll(welcomeLabel, itemListView, refreshButton);
         if (user.getRole().equals("Buyer")) {
-            contentBox.getChildren().addAll(addToWishlistButton, purchaseButton);
+            HBox buttonBox = new HBox(10);
+            buttonBox.getChildren().addAll(addToWishlistButton, purchaseButton);
+            contentBox.getChildren().add(buttonBox);
         }
         contentBox.getChildren().add(messageLabel);
 
-        layout.getChildren().addAll(navigationBar, contentBox);
+        layout.getChildren().add(navigationBar);
+        layout.getChildren().add(contentBox);
 
         scene = new Scene(layout, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
 
-        // Enable add to wishlist button when an item is selected (for Buyers)
         if (user.getRole().equals("Buyer")) {
             itemListView.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
-                addToWishlistButton.setDisable(newSelection == null);
-                purchaseButton.setDisable(newSelection == null);
+                boolean hasSelection = newSelection != null;
+                addToWishlistButton.setDisable(!hasSelection);
+                purchaseButton.setDisable(!hasSelection);
             });
         }
     }

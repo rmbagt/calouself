@@ -75,7 +75,8 @@ public class LoginView {
         messageLabel.setTextFill(Color.RED);
         contentBox.getChildren().add(messageLabel);
 
-        layout.getChildren().addAll(navigationBar, contentBox);
+        layout.getChildren().add(navigationBar);
+        layout.getChildren().add(contentBox);
 
         scene = new Scene(layout, Main.WINDOW_WIDTH, Main.WINDOW_HEIGHT);
     }

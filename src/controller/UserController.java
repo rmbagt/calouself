@@ -7,7 +7,7 @@ import java.util.UUID;
 import connect.Connect;
 import model.User;
 import view.*;
-import javafx.scene.control.RadioButton;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
 
 public class UserController {
@@ -48,7 +48,9 @@ public class UserController {
         
         // Register view handlers
         registerView.getRegisterButton().setOnAction(e -> handleRegister());
-        registerView.getBackButton().setOnAction(e -> showLoginScene());
+        registerView.getBackToLoginButton().setOnAction(e -> showLoginScene());
+        
+        // Dashboard view handlers
         
     }
     
@@ -67,6 +69,7 @@ public class UserController {
         
         if (currentUser.getRole().equals("Buyer")) {
             dashboardView.getAddToWishlistButton().setOnAction(e -> handleAddToWishlist());
+            dashboardView.getPurchaseButton().setOnAction(e -> handlePurchaseItem());
         }
     }
     
@@ -320,6 +323,34 @@ public class UserController {
         adminController.loadPendingItems(adminView);
         stage.setScene(adminView.getScene());
         stage.setTitle("CaLouselF - Admin Dashboard");
+    }
+
+    private void handlePurchaseItem() {
+        String selectedItem = dashboardView.getItemListView().getSelectionModel().getSelectedItem();
+        if (selectedItem == null) {
+            dashboardView.showMessage("Please select an item to purchase", true);
+            return;
+        }
+
+        String itemName = selectedItem.split(" - ")[0];
+        try {
+            String query = "SELECT item_id FROM items WHERE item_name = ? AND status = 'approved'";
+            PreparedStatement ps = connect.prepareStatement(query);
+            ps.setString(1, itemName);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                String itemId = rs.getString("item_id");
+                transactionController.handlePurchaseItem(itemId, currentUser);
+                dashboardView.showMessage("Purchase successful!", false);
+                handleRefreshItems(); // Refresh the items list
+            } else {
+                dashboardView.showMessage("Item not available for purchase", true);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            dashboardView.showMessage("Error processing purchase", true);
+        }
     }
     
 }

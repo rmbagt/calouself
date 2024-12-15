@@ -16,7 +16,6 @@ public class NavigationBar extends MenuBar {
     private Menu historyMenu;
     private MenuItem viewPurchaseHistoryMenuItem;
 
-
     public NavigationBar(User user) {
         createMenus(user);
     }
@@ -50,7 +49,6 @@ public class NavigationBar extends MenuBar {
             viewPurchaseHistoryMenuItem = new MenuItem("View Purchase History");
             historyMenu.getItems().add(viewPurchaseHistoryMenuItem);
         }
-
 
         // Add all menus to the menu bar
         this.getMenus().addAll(userMenu, itemsMenu);
