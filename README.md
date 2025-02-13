@@ -86,7 +86,7 @@ The application uses the following main tables:
 1. Clone the repository
 
 ```bash
-git clone https://github.com/reynaldomarchell/calouself.git
+git clone https://github.com/rmbagt/calouself.git
 ```
 
 2. Add JavaFX and MySQL Java Connection Library to the project
@@ -159,6 +159,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## Contributors
 
-<a href="https://github.com/reynaldomarchell/calouself/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=reynaldomarchell/calouself"/>
+<a href="https://github.com/rmbagt/calouself/graphs/contributors">
+    <img src="https://contrib.rocks/image?repo=rmbagt/calouself"/>
 </a>
